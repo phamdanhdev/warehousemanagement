@@ -1,0 +1,4 @@
+//FILEPATH
+export const ADD_ORDER_PATH = "ADD_ORDER_PATH";
+export const ADD_IMPORT_PATH = "ADD_IMPORT_PATH";
+export const ADD_PRODUCT_PATH = "ADD_PRODUCT_PATH";

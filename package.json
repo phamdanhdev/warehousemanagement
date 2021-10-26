@@ -1,0 +1,62 @@
+{
+  "name": "warehousemanagement",
+  "version": "0.1.0",
+  "description": "Warehouse management",
+  "author": "phamdanh.dev@gmail.com",
+  "main": "public/electron.js",
+  "build": {
+    "appId": "warehousemanagement.id"
+  },
+  "homepage": "./",
+  "dependencies": {
+    "@testing-library/jest-dom": "^5.11.4",
+    "@testing-library/react": "^11.1.0",
+    "@testing-library/user-event": "^12.1.10",
+    "antd": "^4.16.13",
+    "concurrently": "^6.3.0",
+    "cross-env": "^7.0.3",
+    "electron-is-dev": "^2.0.0",
+    "exceljs": "^4.3.0",
+    "node-sass": "4.14.1",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
+    "react-redux": "^7.2.5",
+    "react-router-dom": "^5.3.0",
+    "react-scripts": "4.0.3",
+    "redux": "^4.1.1",
+    "redux-thunk": "^2.3.0",
+    "wait-on": "^6.0.0",
+    "web-vitals": "^1.0.1"
+  },
+  "scripts": {
+    "react-start": "react-scripts start",
+    "react-build": "react-scripts build",
+    "react-test": "react-scripts test",
+    "react-eject": "react-scripts eject",
+    "electron-build": "electron-builder",
+    "build": "yarn run react-build && yarn run electron-build",
+    "start": "concurrently \"cross-env BROWER=none npm run react-start\" \"wait-on http://localhost:3000 && electron .\""
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "devDependencies": {
+    "electron": "^15.3.0",
+    "electron-builder": "^22.13.1"
+  }
+}

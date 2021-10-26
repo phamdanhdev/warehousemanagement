@@ -1,0 +1,54 @@
+.App {
+  ._navbar {
+    backdrop-filter: blur(16px) saturate(180%);
+    -webkit-backdrop-filter: blur(16px) saturate(180%);
+    background-color: #ffffff66;
+    color: white !important;
+    display: flex;
+    justify-content: center;
+    height: 70px;
+    align-items: center;
+    padding: 0 40px;
+    font-size: 0.8rem;
+    h1 {
+      color: white;
+    }
+  }
+
+  ._body {
+    display: flex;
+    ._sidebar {
+      width: 25%;
+      height: calc(100vh - 70px);
+      position: relative;
+      backdrop-filter: blur(16px) saturate(180%);
+      -webkit-backdrop-filter: blur(16px) saturate(180%);
+      background-color: #ffffffa8;
+      color: white !important;
+      overflow: hidden;
+      ._sidebar_item {
+        padding: 15px;
+        font-weight: bold;
+        margin: 20px 0;
+        transition: 0.3s;
+        &:hover {
+          background-color: white;
+        }
+      }
+      ._contact {
+        position: absolute;
+        bottom: 0;
+        width: 100%;
+      }
+      a {
+        color: #551a8b;
+        &:active {
+          color: white;
+        }
+      }
+    }
+    ._content {
+      width: 75%;
+    }
+  }
+}

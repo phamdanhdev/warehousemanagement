@@ -1,0 +1,27 @@
+._homePage {
+  ._homeRow {
+    display: flex;
+    justify-content: space-evenly;
+    margin: 35px 0;
+    ._homePage_item {
+      color: #551a8b;
+      background-color: white;
+      border-radius: 18px;
+      padding: 20px;
+      cursor: pointer;
+      width: 18rem;
+      height: 8rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      transition: 0.2s;
+      &:hover {
+        box-shadow: 0px 0px 15px #ffffff;
+      }
+      h3 {
+        color: #551a8b;
+      }
+    }
+  }
+}
