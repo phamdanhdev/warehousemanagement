@@ -1,33 +1,33 @@
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { getData } from "../../api/index";
-import { Table } from "antd";
+import { Table, DatePicker } from "antd";
+import moment from "moment";
+import "./style.scss";
 
 export default function OrderPage() {
   const { orderFilePath } = useSelector((state) => state.filePath);
   const [orderData, setOrderData] = useState([]);
 
+  const dateFormat = "DD/MM/YYYY";
+
   useEffect(() => {
     (async () => {
       const res = await getData(orderFilePath);
-      console.log({ res });
       let tableData = convertDatatoTableData(res);
-      console.log({ tableData });
       setOrderData(tableData);
     })();
   }, [orderFilePath]);
 
   const convertDatatoTableData = (dataInput = []) => {
-    // console.log(dataInput);
-
     let res = dataInput.reduce((acc, cur) => {
-      console.log(cur);
       let item = {
         key: cur[0],
         id: cur[1],
         name: cur[2],
         quatity: cur[3],
         date: cur[4],
+        time: cur[5],
       };
       return [...acc, item];
     }, []);
@@ -57,10 +57,25 @@ export default function OrderPage() {
       dataIndex: "date",
       key: "date",
     },
+    {
+      title: "Giờ",
+      dataIndex: "time",
+      key: "time",
+    },
   ];
 
   return (
-    <div>
+    <div className="_orderPage">
+      <div className="_filter">
+        <div className="_dateFilter">
+          <span>Ngày</span>
+          <DatePicker
+            defaultValue={moment(new Date(), dateFormat)}
+            format={dateFormat}
+            size="large"
+          />
+        </div>
+      </div>
       <Table columns={columns} dataSource={orderData} />
     </div>
   );

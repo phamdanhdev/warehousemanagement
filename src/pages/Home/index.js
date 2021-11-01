@@ -65,7 +65,7 @@ export default function HomePage() {
             Trạng thái: {filePathStore.orderFilePath ? "Đã chọn" : "Chưa chọn"}
           </p>
         </div>
-        <Link to="/product/add">
+        <Link to="/order/add">
           <div className="_homePage_item">
             <h3>Bán hàng</h3>
           </div>
@@ -78,7 +78,7 @@ export default function HomePage() {
             Trạng thái: {filePathStore.importFilePath ? "Đã chọn" : "Chưa chọn"}
           </p>
         </div>
-        <Link to="/product/add">
+        <Link to="/import/add">
           <div className="_homePage_item">
             <h3>Nhập hàng</h3>
           </div>

@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Route, Switch, Link } from "react-router-dom";
 import HomePage from "./pages/Home";
 import ContactPage from "./pages/Contact";
 import OrderPage from "./pages/Order";
+import OrderAddPage from "./pages/OrderAdd";
 import ProductPage from "./pages/Product";
 import ImportPage from "./pages/Import";
 function App() {
@@ -37,6 +38,9 @@ function App() {
               </Route>
               <Route exact path="/order">
                 <OrderPage />
+              </Route>
+              <Route exact path="/order/add">
+                <OrderAddPage />
               </Route>
               <Route exact path="/import">
                 <ImportPage />

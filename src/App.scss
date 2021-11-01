@@ -13,14 +13,21 @@
     h1 {
       color: white;
     }
+    position: sticky;
+    top: 0;
+    z-index: 1000;
   }
 
   ._body {
     display: flex;
+    justify-content: flex-end;
     ._sidebar {
       width: 25%;
       height: calc(100vh - 70px);
-      position: relative;
+      position: fixed !important;
+      margin-top: 70px;
+      top: 0;
+      left: 0;
       backdrop-filter: blur(16px) saturate(180%);
       -webkit-backdrop-filter: blur(16px) saturate(180%);
       background-color: #ffffffa8;

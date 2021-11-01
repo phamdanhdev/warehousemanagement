@@ -1,0 +1,14 @@
+._orderPage {
+  padding: 40px 25px;
+  ._filter {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 20px;
+    ._dateFilter {
+      color: white;
+      span {
+        margin-right: 10px;
+      }
+    }
+  }
+}
