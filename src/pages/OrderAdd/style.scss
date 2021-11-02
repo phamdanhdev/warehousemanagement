@@ -39,6 +39,17 @@
       font-weight: bold;
     }
   }
+  ._quantityForm {
+    display: flex;
+    color: white;
+    justify-content: space-between;
+    ._quantity {
+      width: 45%;
+    }
+    ._quantityInStock {
+      width: 45%;
+    }
+  }
   ._formBtn {
     margin-top: 4rem;
     text-align: center;

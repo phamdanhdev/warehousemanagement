@@ -1,23 +1,23 @@
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { getData } from "../../api/index";
+import { getOrderData } from "../../api/index";
 import { Table, DatePicker } from "antd";
 import moment from "moment";
 import "./style.scss";
 
 export default function OrderPage() {
-  const { orderFilePath } = useSelector((state) => state.filePath);
+  const { excelFilePath } = useSelector((state) => state.filePath);
   const [orderData, setOrderData] = useState([]);
 
   const dateFormat = "DD/MM/YYYY";
 
   useEffect(() => {
     (async () => {
-      const res = await getData(orderFilePath);
+      const res = await getOrderData(excelFilePath);
       let tableData = convertDatatoTableData(res);
       setOrderData(tableData);
     })();
-  }, [orderFilePath]);
+  }, [excelFilePath]);
 
   const convertDatatoTableData = (dataInput = []) => {
     let res = dataInput.reduce((acc, cur) => {

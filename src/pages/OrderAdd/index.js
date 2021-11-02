@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import "./style.scss";
 import { AutoComplete, Input, message, DatePicker, TimePicker } from "antd";
 import { useSelector } from "react-redux";
-import { getData, saveOrderData } from "../../api/index";
+import { getProductData, saveOrderData } from "../../api/index";
 import moment from "moment";
 
 const timeFormat = "HH:mm";
@@ -11,33 +11,35 @@ const dateFormat = "DD/MM/YYYY";
 let initialOrderForm = {
   id: null,
   name: null,
-  quantity: 1,
+  quantity: null,
   date: moment().format(dateFormat),
   time: moment().format(timeFormat),
 };
 
+let initialQuantityInStock = 0;
+
 export default function OrderAddPage() {
-  const [validId, setValidId] = useState(false);
+  const [validId, setValidId] = useState(false); //To show validate ID
   const [valueSearch, setValueSearch] = useState("");
   const [optionsSearch, setOptionsSearch] = useState([]);
-  const { orderFilePath, productFilePath } = useSelector(
-    (state) => state.filePath
-  );
+  const { excelFilePath } = useSelector((state) => state.filePath);
   const [productData, setProductData] = useState([]);
+  const [quantityInStockState, setQuantityInStockState] = useState(0);
+  const [quantityState, setQuantityState] = useState(1);
 
   const orderForm = useRef(initialOrderForm);
 
   useEffect(() => {
     (async () => {
-      const res = await getData(productFilePath);
+      const res = await getProductData(excelFilePath);
       let searchData = convertDataToSearchData(res);
       setProductData(searchData);
     })();
-  }, [productFilePath]);
+  }, [excelFilePath]);
 
   const convertDataToSearchData = (dataInput = []) => {
     let res = dataInput.reduce((acc, cur) => {
-      let item = `${cur[1]} - ${cur[2]}`;
+      let item = `${cur[1]} - ${cur[2]} - ${cur[3]}`;
       return [...acc, item];
     }, []);
     return res;
@@ -68,31 +70,66 @@ export default function OrderAddPage() {
   };
 
   const onChangeSearch = (data) => {
-    orderForm.current = { ...orderForm.current, id: "", name: "" };
+    orderForm.current = {
+      ...orderForm.current,
+      id: "",
+      name: "",
+      quantity: null,
+    };
     setValidId(false);
     setValueSearch(data?.split("-")[0].trim());
+    setQuantityInStockState(0);
   };
 
   const onSelectSearch = (data) => {
     let id = data.split("-")[0].trim();
     let name = data.split("-")[1].trim();
-    orderForm.current = { ...orderForm.current, id: id, name: name };
+    let quantityInStock = +data.split("-")[2].trim();
+    initialQuantityInStock = quantityInStock;
+    orderForm.current = {
+      ...orderForm.current,
+      id: id,
+      name: name,
+      quantity: 1,
+    };
     setValidId(true);
+    setQuantityInStockState(quantityInStock - 1);
   };
 
   const onChangeQuantity = (num) => {
+    setQuantityState(num.target.value);
     if (isNaN(num.target.value)) {
       message.warning("Số lượng phải là số!");
-      orderForm.current = { ...orderForm.current, quantity: null };
-      console.log(orderForm.current);
+      orderForm.current = {
+        ...orderForm.current,
+        quantity: null,
+      };
+      setQuantityInStockState(initialQuantityInStock);
       return;
     }
     if (+num.target.value < 1) {
       message.warning("Số lượng phải lớn hơn 0!");
-      orderForm.current = { ...orderForm.current, quantity: null };
+      orderForm.current = {
+        ...orderForm.current,
+        quantity: null,
+      };
+      setQuantityInStockState(initialQuantityInStock);
       return;
     }
-    orderForm.current = { ...orderForm.current, quantity: +num.target.value };
+    if (+num.target.value > initialQuantityInStock) {
+      message.warning("Quá số lượng trong kho!");
+      orderForm.current = {
+        ...orderForm.current,
+        quantity: null,
+      };
+      setQuantityInStockState(initialQuantityInStock);
+      return;
+    }
+    orderForm.current = {
+      ...orderForm.current,
+      quantity: +num.target.value,
+    };
+    setQuantityInStockState(initialQuantityInStock - +num.target.value);
   };
 
   const handleChangeDate = (date, dateString) => {
@@ -112,7 +149,7 @@ export default function OrderAddPage() {
       message.error("Thông tin không hợp lệ!");
       return;
     }
-    await saveOrderData(orderFilePath, productFilePath, orderForm.current);
+    await saveOrderData(excelFilePath, orderForm.current);
   };
 
   return (
@@ -150,15 +187,22 @@ export default function OrderAddPage() {
           disabled
         ></Input>
       </div>
-      <div className="_formItem">
-        <span>Số lượng</span>
-        <Input
-          size="large"
-          defaultValue={1}
-          onChange={onChangeQuantity}
-          placeholder="Số lượng không được bỏ trống!"
-        ></Input>
+      <div className="_formItem _quantityForm">
+        <div className="_quantity">
+          <span>Số lượng</span>
+          <Input
+            size="large"
+            value={quantityState}
+            onChange={onChangeQuantity}
+            placeholder="Số lượng không được bỏ trống!"
+          ></Input>
+        </div>
+        <div className="_quantityInStock">
+          <span>Số lượng còn trong kho</span>
+          <Input size="large" value={quantityInStockState} disabled></Input>
+        </div>
       </div>
+
       <div className="_formItem _dateTimeForm">
         <div className="_datePicker">
           <span>Ngày</span>

@@ -8,8 +8,6 @@ const isDev = require("electron-is-dev");
 function createWindow() {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
-    width: 1366,
-    height: 768,
     webPreferences: {
       //   preload: path.join(__dirname, 'preload.js')
       nodeIntegration: true,
@@ -17,6 +15,8 @@ function createWindow() {
       contextIsolation: false,
     },
   });
+
+  mainWindow.maximize();
 
   // and load the index.html of the app.
   mainWindow.loadURL(
