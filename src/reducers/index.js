@@ -1,3 +1,4 @@
 import { combineReducers } from "redux";
 import filePath from "./filePath";
-export default combineReducers({ filePath });
+import loading from "./loading";
+export default combineReducers({ filePath, loading });

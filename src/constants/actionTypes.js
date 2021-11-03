@@ -1,2 +1,4 @@
 //FILEPATH
 export const ADD_EXCEL_PATH = "ADD_EXCEL_PATH";
+export const LOADING_TRUE = "LOADING_TRUE";
+export const LOADING_FALSE = "LOADING_FALSE";

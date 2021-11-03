@@ -58,4 +58,14 @@
       width: 75%;
     }
   }
+  .ant-spin-container {
+    height: calc(100vh - 70px);
+  }
+  .ant-spin {
+    max-height: unset !important;
+    color: white;
+  }
+  .ant-spin-dot-item {
+    background-color: white;
+  }
 }

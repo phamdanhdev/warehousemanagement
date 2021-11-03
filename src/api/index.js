@@ -12,7 +12,6 @@ export const getOrderData = async (filePath) => {
   worksheet.eachRow((row, rowNumber) => {
     let rowData = row.values;
     rowData[0] = rowNumber;
-    // rowData[5] = moment(rowData[5]).format("HH:mm");
     finalData.push(rowData);
   });
   return finalData;
@@ -27,7 +26,6 @@ export const getImportData = async (filePath) => {
   worksheet.eachRow((row, rowNumber) => {
     let rowData = row.values;
     rowData[0] = rowNumber;
-    // rowData[5] = moment(rowData[5]).format("HH:mm");
     finalData.push(rowData);
   });
   return finalData;
@@ -42,24 +40,39 @@ export const getProductData = async (filePath) => {
   worksheet.eachRow((row, rowNumber) => {
     let rowData = row.values;
     rowData[0] = rowNumber;
-    // rowData[5] = moment(rowData[5]).format("HH:mm");
     finalData.push(rowData);
   });
   return finalData;
 };
 
 export const saveOrderData = async (excelFilePath, orderData) => {
-  //Load OrderFile and get OrderSheet
-  const workbook = new ExcelJS.Workbook();
-  let data = await fs.promises.readFile(excelFilePath);
-  await workbook.xlsx.load(data.buffer);
-  const worksheet = workbook.getWorksheet(1);
-
-  //Add data to Sheet
-  worksheet.addRow(Object.values(orderData));
-
   try {
-    //Update to OrderSheet
+    //Load ExcelFile
+    const workbook = new ExcelJS.Workbook();
+    let data = await fs.promises.readFile(excelFilePath);
+    await workbook.xlsx.load(data.buffer);
+
+    //Get and update OrderSheet
+    const worksheet1 = workbook.getWorksheet(1);
+    worksheet1.addRow(Object.values(orderData));
+
+    //Get and update ProductSheet
+    const worksheet3 = workbook.getWorksheet(3);
+    let productRow;
+    worksheet3.eachRow((row, rowNumber) => {
+      let productId = row.values[1];
+      if (productId === orderData.id) {
+        let rowData = row.values;
+        rowData[0] = rowNumber;
+        rowData[3] = +rowData[3] - +orderData?.quantity;
+        productRow = rowData;
+      }
+    });
+    let productRowNum = productRow[0];
+    productRow.shift();
+    worksheet3.spliceRows(productRowNum, 1, productRow);
+
+    //Save to ExcelFile
     const buffer = await workbook.xlsx.writeBuffer();
     const fileName = `${moment().format("YYYY")}_${moment().format("MM")}.xlsx`;
     FileSaver.saveAs(
@@ -68,11 +81,6 @@ export const saveOrderData = async (excelFilePath, orderData) => {
       }),
       fileName
     );
-
-    //Update to ProductSheet
-
-    //Update JSON file
-
     return true;
   } catch (error) {
     console.log(error);

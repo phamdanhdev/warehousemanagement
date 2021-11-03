@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { getOrderData } from "../../api/index";
 import { Table, DatePicker } from "antd";
 import moment from "moment";
 import "./style.scss";
+import { setLoading } from "../../actions/loading";
 
 export default function OrderPage() {
+  const dispatch = useDispatch();
   const { excelFilePath } = useSelector((state) => state.filePath);
   const [orderData, setOrderData] = useState([]);
 
@@ -13,11 +15,13 @@ export default function OrderPage() {
 
   useEffect(() => {
     (async () => {
+      dispatch(setLoading(true));
       const res = await getOrderData(excelFilePath);
       let tableData = convertDatatoTableData(res);
       setOrderData(tableData);
+      dispatch(setLoading(false));
     })();
-  }, [excelFilePath]);
+  }, [excelFilePath, dispatch]);
 
   const convertDatatoTableData = (dataInput = []) => {
     let res = dataInput.reduce((acc, cur) => {
@@ -66,6 +70,7 @@ export default function OrderPage() {
 
   return (
     <div className="_orderPage">
+      <h1>Quản lý bán hàng</h1>
       <div className="_filter">
         <div className="_dateFilter">
           <span>Ngày</span>
