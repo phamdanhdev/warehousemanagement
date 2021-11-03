@@ -1,7 +1,9 @@
 import React, { useState, useEffect, useRef } from "react";
+import { useHistory } from "react-router-dom";
+import { setLoading } from "../../actions/loading";
 import "./style.scss";
 import { AutoComplete, Input, message, DatePicker, TimePicker } from "antd";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { getProductData, saveOrderData } from "../../api/index";
 import moment from "moment";
 
@@ -28,6 +30,8 @@ export default function OrderAddPage() {
   const [quantityState, setQuantityState] = useState(1);
 
   const orderForm = useRef(initialOrderForm);
+  const history = useHistory();
+  const dispatch = useDispatch();
 
   useEffect(() => {
     (async () => {
@@ -141,6 +145,7 @@ export default function OrderAddPage() {
   };
 
   const handleAddNewOrder = async () => {
+    dispatch(setLoading(true));
     if (
       orderForm.current.id === "" ||
       orderForm.current.id === null ||
@@ -149,7 +154,14 @@ export default function OrderAddPage() {
       message.error("Thông tin không hợp lệ!");
       return;
     }
-    await saveOrderData(excelFilePath, orderForm.current);
+    let saveStatus = await saveOrderData(excelFilePath, orderForm.current);
+    dispatch(setLoading(false));
+    if (saveStatus) {
+      history.push("/");
+    } else {
+      message.error("Thêm mới không thành công!");
+      return;
+    }
   };
 
   return (

@@ -28,7 +28,7 @@ export default function HomePage() {
     <div className="_homePage">
       <div className="_homePathRow">
         <div className="_homePage_item" onClick={showExcelFileModal}>
-          <h3>Chọn file bán hàng</h3>
+          <h3>Chọn file</h3>
           <p>
             Trạng thái: {filePathStore.excelFilePath ? "Đã chọn" : "Chưa chọn"}
           </p>

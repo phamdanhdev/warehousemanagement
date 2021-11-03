@@ -2,3 +2,6 @@
 export const ADD_EXCEL_PATH = "ADD_EXCEL_PATH";
 export const LOADING_TRUE = "LOADING_TRUE";
 export const LOADING_FALSE = "LOADING_FALSE";
+export const ADD_ORDER_DATA = "ADD_ORDER_DATA";
+export const ADD_IMPORT_DATA = "ADD_IMPORT_DATA";
+export const ADD_PRODUCT_DATA = "ADD_PRODUCT_DATA";

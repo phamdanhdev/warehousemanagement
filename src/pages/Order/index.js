@@ -5,10 +5,12 @@ import { Table, DatePicker } from "antd";
 import moment from "moment";
 import "./style.scss";
 import { setLoading } from "../../actions/loading";
+import { addOrderData } from "../../actions/order";
 
 export default function OrderPage() {
   const dispatch = useDispatch();
   const { excelFilePath } = useSelector((state) => state.filePath);
+  const orderDataStore = useSelector((state) => state.order);
   const [orderData, setOrderData] = useState([]);
 
   const dateFormat = "DD/MM/YYYY";
@@ -18,10 +20,17 @@ export default function OrderPage() {
       dispatch(setLoading(true));
       const res = await getOrderData(excelFilePath);
       let tableData = convertDatatoTableData(res);
-      setOrderData(tableData);
+      setOrderData(
+        getOrderDataByDate(tableData, moment().format("DD/MM/YYYY"))
+      );
+      dispatch(addOrderData(tableData));
       dispatch(setLoading(false));
     })();
   }, [excelFilePath, dispatch]);
+
+  const getOrderDataByDate = (orderData, date) => {
+    return orderData.filter((e) => e.date === date);
+  };
 
   const convertDatatoTableData = (dataInput = []) => {
     let res = dataInput.reduce((acc, cur) => {
@@ -36,6 +45,10 @@ export default function OrderPage() {
       return [...acc, item];
     }, []);
     return res;
+  };
+
+  const handleChangeDateFilter = (date, dateString) => {
+    setOrderData(getOrderDataByDate(orderDataStore, dateString));
   };
 
   //TABLE CONFIG
@@ -78,6 +91,7 @@ export default function OrderPage() {
             defaultValue={moment(new Date(), dateFormat)}
             format={dateFormat}
             size="large"
+            onChange={handleChangeDateFilter}
           />
         </div>
       </div>
