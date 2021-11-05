@@ -4,157 +4,122 @@ import { setLoading } from "../../actions/loading";
 import "./style.scss";
 import { AutoComplete, Input, message, DatePicker, TimePicker } from "antd";
 import { useSelector, useDispatch } from "react-redux";
-import { getProductData, saveOrderData } from "../../api/index";
+import { getProductData, saveImportData } from "../../api/index";
 import moment from "moment";
 
 const timeFormat = "HH:mm";
 const dateFormat = "DD/MM/YYYY";
 
-let initialOrderForm = {
+let initialProductForm = {
   id: null,
   name: null,
-  quantity: null,
+  quantity: 1,
   date: moment().format(dateFormat),
   time: moment().format(timeFormat),
 };
 
-let initialQuantityInStock = 0;
-
-export default function OrderAddPage() {
+export default function ProductAddPage() {
   const [validId, setValidId] = useState(false); //To show validate ID
   const [valueSearch, setValueSearch] = useState("");
-  const [optionsSearch, setOptionsSearch] = useState([]);
   const { excelFilePath } = useSelector((state) => state.filePath);
   const [productData, setProductData] = useState([]);
-  const [quantityInStockState, setQuantityInStockState] = useState(0);
   const [quantityState, setQuantityState] = useState(1);
 
-  const orderForm = useRef(initialOrderForm);
+  const productForm = useRef(initialProductForm);
   const history = useHistory();
   const dispatch = useDispatch();
 
   useEffect(() => {
     (async () => {
       const res = await getProductData(excelFilePath);
-      let searchData = convertDataToSearchData(res);
-      setProductData(searchData);
+      let idData = convertDataToIdData(res);
+      setProductData(idData);
     })();
   }, [excelFilePath]);
 
-  const convertDataToSearchData = (dataInput = []) => {
+  const convertDataToIdData = (dataInput = []) => {
     let res = dataInput.reduce((acc, cur) => {
-      let item = `${cur[1]} - ${cur[2]} - ${cur[3]}`;
+      let item = `${cur[1]}`;
       return [...acc, item];
     }, []);
     return res;
-  };
-
-  const getSearchSuggestion = (searchText) => {
-    let productDataMatch = [];
-    productData.every((e) => {
-      if (productDataMatch.length > 5) {
-        return false;
-      }
-      let id = e.split("-")[0].trim().toLowerCase();
-      if (id.includes(searchText.toLowerCase())) {
-        productDataMatch.push(e);
-        return true;
-      }
-      return true;
-    });
-    let res = productDataMatch.reduce((acc, cur) => {
-      let item = { value: cur };
-      return [...acc, item];
-    }, []);
-    return res;
-  };
-
-  const onSearch = (searchText) => {
-    setOptionsSearch(!searchText ? [] : getSearchSuggestion(searchText));
   };
 
   const onChangeSearch = (data) => {
-    orderForm.current = {
-      ...orderForm.current,
-      id: "",
-      name: "",
-      quantity: null,
-    };
-    setValidId(false);
-    setValueSearch(data?.split("-")[0].trim());
-    setQuantityInStockState(0);
-  };
+    setValueSearch(data);
+    if (!data.length) {
+      setValidId(false);
+      return;
+    }
 
-  const onSelectSearch = (data) => {
-    let id = data.split("-")[0].trim();
-    let name = data.split("-")[1].trim();
-    let quantityInStock = +data.split("-")[2].trim();
-    initialQuantityInStock = quantityInStock;
-    orderForm.current = {
-      ...orderForm.current,
-      id: id,
-      name: name,
-      quantity: 1,
+    data.split("").forEach((e) => {
+      if (e.indexOf(" ") >= 0) {
+        setValidId(false);
+        return;
+      }
+    });
+
+    let idIsAvailable = productData.some(
+      (e) => e.trim().toLowerCase() === data.trim().toLowerCase()
+    );
+    if (idIsAvailable) {
+      setValidId(false);
+      return;
+    }
+    productForm.current = {
+      ...productForm.current,
+      id: data,
     };
     setValidId(true);
-    setQuantityInStockState(quantityInStock - 1);
   };
 
   const onChangeQuantity = (num) => {
     setQuantityState(num.target.value);
     if (isNaN(num.target.value)) {
       message.warning("Số lượng phải là số!");
-      orderForm.current = {
-        ...orderForm.current,
+      productForm.current = {
+        ...productForm.current,
         quantity: null,
       };
-      setQuantityInStockState(initialQuantityInStock);
       return;
     }
     if (+num.target.value < 1) {
       message.warning("Số lượng phải lớn hơn 0!");
-      orderForm.current = {
-        ...orderForm.current,
+      productForm.current = {
+        ...productForm.current,
         quantity: null,
       };
-      setQuantityInStockState(initialQuantityInStock);
       return;
     }
-    if (+num.target.value > initialQuantityInStock) {
-      message.warning("Quá số lượng trong kho!");
-      orderForm.current = {
-        ...orderForm.current,
-        quantity: null,
-      };
-      setQuantityInStockState(initialQuantityInStock);
-      return;
-    }
-    orderForm.current = {
-      ...orderForm.current,
+    productForm.current = {
+      ...productForm.current,
       quantity: +num.target.value,
     };
-    setQuantityInStockState(initialQuantityInStock - +num.target.value);
   };
 
   const handleChangeDate = (date, dateString) => {
-    orderForm.current = { ...orderForm.current, date: dateString };
+    productForm.current = { ...productForm.current, date: dateString };
   };
 
   const handleChangeTime = (time, timeString) => {
-    orderForm.current = { ...orderForm.current, time: timeString };
+    productForm.current = { ...productForm.current, time: timeString };
   };
 
-  const handleAddNewOrder = async () => {
+  const handleAddNewProduct = async () => {
     dispatch(setLoading(true));
     if (
-      orderForm.current.id === "" ||
-      orderForm.current.id === null ||
-      orderForm.current.quantity === null
+      productForm.current.id === "" ||
+      productForm.current.id === null ||
+      productForm.current.name.length < 1 ||
+      productForm.current.quantity === null ||
+      !validId
     ) {
       message.error("Thông tin không hợp lệ!");
       return;
     }
-    let saveStatus = await saveOrderData(excelFilePath, orderForm.current);
+    // let saveStatus = await saveImportData(excelFilePath, productForm.current);
+    let saveStatus = false;
+
     dispatch(setLoading(false));
     if (saveStatus) {
       history.push("/");
@@ -164,8 +129,15 @@ export default function OrderAddPage() {
     }
   };
 
+  const onChangeName = (nameStr) => {
+    productForm.current = {
+      ...productForm.current,
+      name: nameStr.target.value,
+    };
+  };
+
   return (
-    <div className="_orderAddPage">
+    <div className="_productAddPage">
       <h2>Thêm đơn hàng mới</h2>
       <div className="_formItem _searchForm">
         <span>Mã sản phẩm</span>
@@ -173,10 +145,7 @@ export default function OrderAddPage() {
           className="_autoComplete"
           allowClear={true}
           value={valueSearch}
-          options={optionsSearch}
           size="large"
-          onSelect={onSelectSearch}
-          onSearch={onSearch}
           onChange={onChangeSearch}
           placeholder="Mã sản phẩm"
         />
@@ -186,7 +155,7 @@ export default function OrderAddPage() {
           </p>
         ) : (
           <p className="_searchMessage" style={{ color: "red" }}>
-            Mã sản phẩm không tồn tại!
+            Mã sản phẩm đã tồn tại!
           </p>
         )}
       </div>
@@ -194,9 +163,8 @@ export default function OrderAddPage() {
         <span>Tên sản phẩm</span>
         <Input
           size="large"
-          value={orderForm.current.name}
+          onChange={onChangeName}
           placeholder="Tên sản phẩm"
-          disabled
         ></Input>
       </div>
       <div className="_formItem _quantityForm">
@@ -208,10 +176,6 @@ export default function OrderAddPage() {
             onChange={onChangeQuantity}
             placeholder="Số lượng không được bỏ trống!"
           ></Input>
-        </div>
-        <div className="_quantityInStock">
-          <span>Số lượng còn trong kho</span>
-          <Input size="large" value={quantityInStockState} disabled></Input>
         </div>
       </div>
 
@@ -237,11 +201,11 @@ export default function OrderAddPage() {
       </div>
       <div className="_formBtn">
         <button
-          className="_addOrderBtn"
+          className="_addProductBtn"
           type="primary"
-          onClick={handleAddNewOrder}
+          onClick={handleAddNewProduct}
         >
-          Thêm đơn hàng mới
+          Thêm sản phẩm mới
         </button>
       </div>
     </div>

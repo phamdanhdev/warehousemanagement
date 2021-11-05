@@ -1,0 +1,71 @@
+._importAddPage {
+  padding: 2rem 10rem;
+  h2 {
+    text-align: center;
+    color: white;
+    font-weight: bold;
+    padding-bottom: 1rem;
+  }
+  ._formItem {
+    > span {
+      color: white;
+    }
+    ._autoComplete {
+      width: 100%;
+    }
+    p {
+      margin-bottom: 0;
+    }
+    margin-bottom: 1.5rem;
+  }
+  ._dateTimeForm {
+    display: flex;
+    span {
+      margin-right: 0.5rem;
+      color: white;
+    }
+    ._datePicker {
+      margin-right: 4rem;
+    }
+  }
+  ._searchForm {
+    ._searchMessage {
+      background-color: #ffffffe5;
+      padding: 2px 5px;
+      margin-top: 0.5rem;
+      width: fit-content;
+      border-radius: 5px;
+      font-size: 0.8rem;
+      font-weight: bold;
+    }
+  }
+  ._quantityForm {
+    display: flex;
+    color: white;
+    justify-content: space-between;
+    ._quantity {
+      width: 45%;
+    }
+    ._quantityInStock {
+      width: 45%;
+    }
+  }
+  ._formBtn {
+    margin-top: 4rem;
+    text-align: center;
+    ._addImportBtn {
+      border: none;
+      height: 50px;
+      border-radius: 10px;
+      background: white;
+      font-size: 1.2rem;
+      width: 65%;
+      color: #480048;
+      transition: 0.3s;
+      cursor: pointer;
+      &:hover {
+        box-shadow: 0 0 25px white;
+      }
+    }
+  }
+}

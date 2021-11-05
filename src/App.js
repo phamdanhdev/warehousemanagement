@@ -8,7 +8,9 @@ import ContactPage from "./pages/Contact";
 import OrderPage from "./pages/Order";
 import OrderAddPage from "./pages/OrderAdd";
 import ProductPage from "./pages/Product";
+import ProductAddPage from "./pages/ProductAdd";
 import ImportPage from "./pages/Import";
+import ImportAddPage from "./pages/ImportAdd";
 function App() {
   const dispatch = useDispatch();
   const isLoading = useSelector((state) => state.loading);
@@ -51,8 +53,14 @@ function App() {
                 <Route exact path="/import">
                   <ImportPage />
                 </Route>
+                <Route exact path="/import/add">
+                  <ImportAddPage />
+                </Route>
                 <Route exact path="/product">
                   <ProductPage />
+                </Route>
+                <Route exact path="/product/add">
+                  <ProductAddPage />
                 </Route>
                 <Route exact path="/contact">
                   <ContactPage />

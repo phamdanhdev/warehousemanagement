@@ -4,13 +4,13 @@ import { setLoading } from "../../actions/loading";
 import "./style.scss";
 import { AutoComplete, Input, message, DatePicker, TimePicker } from "antd";
 import { useSelector, useDispatch } from "react-redux";
-import { getProductData, saveOrderData } from "../../api/index";
+import { getProductData, saveImportData } from "../../api/index";
 import moment from "moment";
 
 const timeFormat = "HH:mm";
 const dateFormat = "DD/MM/YYYY";
 
-let initialOrderForm = {
+let initialImportForm = {
   id: null,
   name: null,
   quantity: null,
@@ -18,9 +18,7 @@ let initialOrderForm = {
   time: moment().format(timeFormat),
 };
 
-let initialQuantityInStock = 0;
-
-export default function OrderAddPage() {
+export default function ImportAddPage() {
   const [validId, setValidId] = useState(false); //To show validate ID
   const [valueSearch, setValueSearch] = useState("");
   const [optionsSearch, setOptionsSearch] = useState([]);
@@ -29,7 +27,7 @@ export default function OrderAddPage() {
   const [quantityInStockState, setQuantityInStockState] = useState(0);
   const [quantityState, setQuantityState] = useState(1);
 
-  const orderForm = useRef(initialOrderForm);
+  const importForm = useRef(initialImportForm);
   const history = useHistory();
   const dispatch = useDispatch();
 
@@ -74,8 +72,8 @@ export default function OrderAddPage() {
   };
 
   const onChangeSearch = (data) => {
-    orderForm.current = {
-      ...orderForm.current,
+    importForm.current = {
+      ...importForm.current,
       id: "",
       name: "",
       quantity: null,
@@ -89,72 +87,59 @@ export default function OrderAddPage() {
     let id = data.split("-")[0].trim();
     let name = data.split("-")[1].trim();
     let quantityInStock = +data.split("-")[2].trim();
-    initialQuantityInStock = quantityInStock;
-    orderForm.current = {
-      ...orderForm.current,
+    importForm.current = {
+      ...importForm.current,
       id: id,
       name: name,
       quantity: 1,
     };
     setValidId(true);
-    setQuantityInStockState(quantityInStock - 1);
+    setQuantityInStockState(quantityInStock);
   };
 
   const onChangeQuantity = (num) => {
     setQuantityState(num.target.value);
     if (isNaN(num.target.value)) {
       message.warning("Số lượng phải là số!");
-      orderForm.current = {
-        ...orderForm.current,
+      importForm.current = {
+        ...importForm.current,
         quantity: null,
       };
-      setQuantityInStockState(initialQuantityInStock);
       return;
     }
     if (+num.target.value < 1) {
       message.warning("Số lượng phải lớn hơn 0!");
-      orderForm.current = {
-        ...orderForm.current,
+      importForm.current = {
+        ...importForm.current,
         quantity: null,
       };
-      setQuantityInStockState(initialQuantityInStock);
       return;
     }
-    if (+num.target.value > initialQuantityInStock) {
-      message.warning("Quá số lượng trong kho!");
-      orderForm.current = {
-        ...orderForm.current,
-        quantity: null,
-      };
-      setQuantityInStockState(initialQuantityInStock);
-      return;
-    }
-    orderForm.current = {
-      ...orderForm.current,
+    importForm.current = {
+      ...importForm.current,
       quantity: +num.target.value,
     };
-    setQuantityInStockState(initialQuantityInStock - +num.target.value);
   };
 
   const handleChangeDate = (date, dateString) => {
-    orderForm.current = { ...orderForm.current, date: dateString };
+    importForm.current = { ...importForm.current, date: dateString };
   };
 
   const handleChangeTime = (time, timeString) => {
-    orderForm.current = { ...orderForm.current, time: timeString };
+    importForm.current = { ...importForm.current, time: timeString };
   };
 
-  const handleAddNewOrder = async () => {
+  const handleAddNewImport = async () => {
     dispatch(setLoading(true));
     if (
-      orderForm.current.id === "" ||
-      orderForm.current.id === null ||
-      orderForm.current.quantity === null
+      importForm.current.id === "" ||
+      importForm.current.id === null ||
+      importForm.current.quantity === null
     ) {
       message.error("Thông tin không hợp lệ!");
       return;
     }
-    let saveStatus = await saveOrderData(excelFilePath, orderForm.current);
+    let saveStatus = await saveImportData(excelFilePath, importForm.current);
     dispatch(setLoading(false));
     if (saveStatus) {
       history.push("/");
@@ -165,7 +150,7 @@ export default function OrderAddPage() {
   };
 
   return (
-    <div className="_orderAddPage">
+    <div className="_importAddPage">
       <h2>Thêm đơn hàng mới</h2>
       <div className="_formItem _searchForm">
         <span>Mã sản phẩm</span>
@@ -194,7 +179,7 @@ export default function OrderAddPage() {
         <span>Tên sản phẩm</span>
         <Input
           size="large"
-          value={orderForm.current.name}
+          value={importForm.current.name}
           placeholder="Tên sản phẩm"
           disabled
         ></Input>
@@ -237,11 +222,11 @@ export default function OrderAddPage() {
       </div>
       <div className="_formBtn">
         <button
-          className="_addOrderBtn"
+          className="_addImportBtn"
           type="primary"
-          onClick={handleAddNewOrder}
+          onClick={handleAddNewImport}
         >
-          Thêm đơn hàng mới
+          Nhập thêm hàng
         </button>
       </div>
     </div>
