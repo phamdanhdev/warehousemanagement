@@ -38,7 +38,7 @@ export default function OrderPage() {
         key: cur[0],
         id: cur[1],
         name: cur[2],
-        quatity: cur[3],
+        quantity: cur[3],
         date: cur[4],
         time: cur[5],
       };
@@ -49,6 +49,10 @@ export default function OrderPage() {
 
   const handleChangeDateFilter = (date, dateString) => {
     setOrderData(getOrderDataByDate(orderDataStore, dateString));
+  };
+
+  const handleViewAllBtn = () => {
+    setOrderData(orderDataStore);
   };
 
   //TABLE CONFIG
@@ -66,8 +70,8 @@ export default function OrderPage() {
     },
     {
       title: "Số lượng",
-      dataIndex: "quatity",
-      key: "quatity",
+      dataIndex: "quantity",
+      key: "quantity",
     },
     {
       title: "Ngày",
@@ -93,6 +97,9 @@ export default function OrderPage() {
             size="large"
             onChange={handleChangeDateFilter}
           />
+        </div>
+        <div className="_viewAll">
+          <button onClick={handleViewAllBtn}>Xem tất cả</button>
         </div>
       </div>
       <Table columns={columns} dataSource={orderData} />

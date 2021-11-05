@@ -1,0 +1,28 @@
+._productPage {
+  padding: 40px 25px;
+  text-align: center;
+  h1 {
+    color: white;
+  }
+  ._filter {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    align-items: center;
+    ._dateFilter {
+      color: white;
+      span {
+        margin-right: 10px;
+      }
+    }
+    ._searchForm {
+      > span {
+        margin: 0 12px;
+        color: white;
+      }
+      ._autoComplete {
+        width: 400px;
+      }
+    }
+  }
+}
