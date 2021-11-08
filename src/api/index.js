@@ -123,7 +123,7 @@ export const saveImportData = async (excelFilePath, importData) => {
       if (productId === importData.id) {
         let rowData = row.values;
         rowData[0] = rowNumber;
-        rowData[3] = +rowData[3] - +importData?.quantity;
+        rowData[3] = +rowData[3] + +importData?.quantity;
         productRow = rowData;
       }
     });
