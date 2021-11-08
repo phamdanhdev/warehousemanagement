@@ -252,6 +252,7 @@ export default function ImportAddPage() {
         visible={isModalVisible}
         onOk={handleOk}
         onCancel={handleCancel}
+        cancelText="Huỷ"
       >
         <p>
           Mã sản phẩm:{" "}
