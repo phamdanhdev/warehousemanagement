@@ -2,7 +2,14 @@ import React, { useState, useEffect, useRef } from "react";
 import { useHistory } from "react-router-dom";
 import { setLoading } from "../../actions/loading";
 import "./style.scss";
-import { AutoComplete, Input, message, DatePicker, TimePicker } from "antd";
+import {
+  AutoComplete,
+  Input,
+  message,
+  DatePicker,
+  TimePicker,
+  Modal,
+} from "antd";
 import { useSelector, useDispatch } from "react-redux";
 import { getProductData, saveImportData } from "../../api/index";
 import moment from "moment";
@@ -26,6 +33,7 @@ export default function ImportAddPage() {
   const [productData, setProductData] = useState([]);
   const [quantityInStockState, setQuantityInStockState] = useState(0);
   const [quantityState, setQuantityState] = useState(1);
+  const [isModalVisible, setIsModalVisible] = useState(false);
 
   const importForm = useRef(initialImportForm);
   const history = useHistory();
@@ -137,6 +145,7 @@ export default function ImportAddPage() {
       importForm.current.quantity === null
     ) {
       message.error("Thông tin không hợp lệ!");
+      dispatch(setLoading(false));
       return;
     }
     let saveStatus = await saveImportData(excelFilePath, importForm.current);
@@ -147,6 +156,19 @@ export default function ImportAddPage() {
       message.error("Thêm mới không thành công!");
       return;
     }
+  };
+
+  const showModal = () => {
+    setIsModalVisible(true);
+  };
+
+  const handleOk = () => {
+    setIsModalVisible(false);
+    handleAddNewImport();
+  };
+
+  const handleCancel = () => {
+    setIsModalVisible(false);
   };
 
   return (
@@ -221,14 +243,39 @@ export default function ImportAddPage() {
         </div>
       </div>
       <div className="_formBtn">
-        <button
-          className="_addImportBtn"
-          type="primary"
-          onClick={handleAddNewImport}
-        >
+        <button className="_addImportBtn" type="primary" onClick={showModal}>
           Nhập thêm hàng
         </button>
       </div>
+      <Modal
+        title="Xác nhận nhập hàng"
+        visible={isModalVisible}
+        onOk={handleOk}
+        onCancel={handleCancel}
+      >
+        <p>
+          Mã sản phẩm:{" "}
+          <span style={{ fontWeight: "bold" }}>{importForm.current.id}</span>
+        </p>
+        <p>
+          Tên sản phẩm:{" "}
+          <span style={{ fontWeight: "bold" }}>{importForm.current.name}</span>
+        </p>
+        <p>
+          Số lượng:{" "}
+          <span style={{ fontWeight: "bold" }}>
+            {importForm.current.quantity}
+          </span>
+        </p>
+        <p>
+          Ngày:{" "}
+          <span style={{ fontWeight: "bold" }}>{importForm.current.date}</span>
+        </p>
+        <p>
+          Giờ:{" "}
+          <span style={{ fontWeight: "bold" }}>{importForm.current.time}</span>
+        </p>
+      </Modal>
     </div>
   );
 }

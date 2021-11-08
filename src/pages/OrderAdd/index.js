@@ -2,7 +2,14 @@ import React, { useState, useEffect, useRef } from "react";
 import { useHistory } from "react-router-dom";
 import { setLoading } from "../../actions/loading";
 import "./style.scss";
-import { AutoComplete, Input, message, DatePicker, TimePicker } from "antd";
+import {
+  AutoComplete,
+  Input,
+  message,
+  DatePicker,
+  TimePicker,
+  Modal,
+} from "antd";
 import { useSelector, useDispatch } from "react-redux";
 import { getProductData, saveOrderData } from "../../api/index";
 import moment from "moment";
@@ -28,6 +35,7 @@ export default function OrderAddPage() {
   const [productData, setProductData] = useState([]);
   const [quantityInStockState, setQuantityInStockState] = useState(0);
   const [quantityState, setQuantityState] = useState(1);
+  const [isModalVisible, setIsModalVisible] = useState(false);
 
   const orderForm = useRef(initialOrderForm);
   const history = useHistory();
@@ -152,6 +160,7 @@ export default function OrderAddPage() {
       orderForm.current.quantity === null
     ) {
       message.error("Thông tin không hợp lệ!");
+      dispatch(setLoading(false));
       return;
     }
     let saveStatus = await saveOrderData(excelFilePath, orderForm.current);
@@ -162,6 +171,19 @@ export default function OrderAddPage() {
       message.error("Thêm mới không thành công!");
       return;
     }
+  };
+
+  const showModal = () => {
+    setIsModalVisible(true);
+  };
+
+  const handleOk = () => {
+    setIsModalVisible(false);
+    handleAddNewOrder();
+  };
+
+  const handleCancel = () => {
+    setIsModalVisible(false);
   };
 
   return (
@@ -236,14 +258,39 @@ export default function OrderAddPage() {
         </div>
       </div>
       <div className="_formBtn">
-        <button
-          className="_addOrderBtn"
-          type="primary"
-          onClick={handleAddNewOrder}
-        >
+        <button className="_addOrderBtn" type="primary" onClick={showModal}>
           Thêm đơn hàng mới
         </button>
       </div>
+      <Modal
+        title="Xác nhận đơn hàng"
+        visible={isModalVisible}
+        onOk={handleOk}
+        onCancel={handleCancel}
+      >
+        <p>
+          Mã sản phẩm:{" "}
+          <span style={{ fontWeight: "bold" }}>{orderForm.current.id}</span>
+        </p>
+        <p>
+          Tên sản phẩm:{" "}
+          <span style={{ fontWeight: "bold" }}>{orderForm.current.name}</span>
+        </p>
+        <p>
+          Số lượng:{" "}
+          <span style={{ fontWeight: "bold" }}>
+            {orderForm.current.quantity}
+          </span>
+        </p>
+        <p>
+          Ngày:{" "}
+          <span style={{ fontWeight: "bold" }}>{orderForm.current.date}</span>
+        </p>
+        <p>
+          Giờ:{" "}
+          <span style={{ fontWeight: "bold" }}>{orderForm.current.time}</span>
+        </p>
+      </Modal>
     </div>
   );
 }

@@ -130,3 +130,30 @@ export const saveImportData = async (excelFilePath, importData) => {
     return false;
   }
 };
+
+export const saveProductData = async (excelFilePath, productData) => {
+  try {
+    //Load ExcelFile
+    const workbook = new ExcelJS.Workbook();
+    let data = await fs.promises.readFile(excelFilePath);
+    await workbook.xlsx.load(data.buffer);
+
+    //Get and update ProductSheet
+    const worksheet3 = workbook.getWorksheet(3);
+    worksheet3.addRow(Object.values(productData));
+
+    //Save to ExcelFile
+    const buffer = await workbook.xlsx.writeBuffer();
+    const fileName = `${moment().format("YYYY")}_${moment().format("MM")}.xlsx`;
+    FileSaver.saveAs(
+      new Blob([buffer], {
+        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      }),
+      fileName
+    );
+    return true;
+  } catch (error) {
+    console.log(error);
+    return false;
+  }
+};

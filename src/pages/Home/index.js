@@ -34,23 +34,27 @@ export default function HomePage() {
           </p>
         </div>
       </div>
-      <div className="_homeRow">
-        <Link to="/order/add">
-          <div className="_homePage_item">
-            <h3>Bán hàng</h3>
-          </div>
-        </Link>
-        <Link to="/import/add">
-          <div className="_homePage_item">
-            <h3>Nhập hàng</h3>
-          </div>
-        </Link>
-        <Link to="/product/add">
-          <div className="_homePage_item">
-            <h3>Thêm sản phẩm mới</h3>
-          </div>
-        </Link>
-      </div>
+      {filePathStore.excelFilePath ? (
+        <div className="_homeRow">
+          <Link to="/order/add">
+            <div className="_homePage_item">
+              <h3>Bán hàng</h3>
+            </div>
+          </Link>
+          <Link to="/import/add">
+            <div className="_homePage_item">
+              <h3>Nhập hàng</h3>
+            </div>
+          </Link>
+          <Link to="/product/add">
+            <div className="_homePage_item">
+              <h3>Thêm sản phẩm mới</h3>
+            </div>
+          </Link>
+        </div>
+      ) : (
+        <p className="_chooseFileText">Vui lòng chọn file!</p>
+      )}
       <Modal
         title="Chọn file"
         closable={false}

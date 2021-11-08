@@ -2,9 +2,16 @@ import React, { useState, useEffect, useRef } from "react";
 import { useHistory } from "react-router-dom";
 import { setLoading } from "../../actions/loading";
 import "./style.scss";
-import { AutoComplete, Input, message, DatePicker, TimePicker } from "antd";
+import {
+  AutoComplete,
+  Input,
+  message,
+  DatePicker,
+  TimePicker,
+  Modal,
+} from "antd";
 import { useSelector, useDispatch } from "react-redux";
-import { getProductData, saveImportData } from "../../api/index";
+import { getProductData, saveProductData } from "../../api/index";
 import moment from "moment";
 
 const timeFormat = "HH:mm";
@@ -24,6 +31,7 @@ export default function ProductAddPage() {
   const { excelFilePath } = useSelector((state) => state.filePath);
   const [productData, setProductData] = useState([]);
   const [quantityState, setQuantityState] = useState(1);
+  const [isModalVisible, setIsModalVisible] = useState(false);
 
   const productForm = useRef(initialProductForm);
   const history = useHistory();
@@ -115,10 +123,10 @@ export default function ProductAddPage() {
       !validId
     ) {
       message.error("Thông tin không hợp lệ!");
+      dispatch(setLoading(false));
       return;
     }
-    // let saveStatus = await saveImportData(excelFilePath, productForm.current);
-    let saveStatus = false;
+    let saveStatus = await saveProductData(excelFilePath, productForm.current);
 
     dispatch(setLoading(false));
     if (saveStatus) {
@@ -134,6 +142,19 @@ export default function ProductAddPage() {
       ...productForm.current,
       name: nameStr.target.value,
     };
+  };
+
+  const showModal = () => {
+    setIsModalVisible(true);
+  };
+
+  const handleOk = () => {
+    setIsModalVisible(false);
+    handleAddNewProduct();
+  };
+
+  const handleCancel = () => {
+    setIsModalVisible(false);
   };
 
   return (
@@ -200,14 +221,39 @@ export default function ProductAddPage() {
         </div>
       </div>
       <div className="_formBtn">
-        <button
-          className="_addProductBtn"
-          type="primary"
-          onClick={handleAddNewProduct}
-        >
+        <button className="_addProductBtn" type="primary" onClick={showModal}>
           Thêm sản phẩm mới
         </button>
       </div>
+      <Modal
+        title="Xác nhận sản phẩm mới"
+        visible={isModalVisible}
+        onOk={handleOk}
+        onCancel={handleCancel}
+      >
+        <p>
+          Mã sản phẩm:{" "}
+          <span style={{ fontWeight: "bold" }}>{productForm.current.id}</span>
+        </p>
+        <p>
+          Tên sản phẩm:{" "}
+          <span style={{ fontWeight: "bold" }}>{productForm.current.name}</span>
+        </p>
+        <p>
+          Số lượng:{" "}
+          <span style={{ fontWeight: "bold" }}>
+            {productForm.current.quantity}
+          </span>
+        </p>
+        <p>
+          Ngày:{" "}
+          <span style={{ fontWeight: "bold" }}>{productForm.current.date}</span>
+        </p>
+        <p>
+          Giờ:{" "}
+          <span style={{ fontWeight: "bold" }}>{productForm.current.time}</span>
+        </p>
+      </Modal>
     </div>
   );
 }
