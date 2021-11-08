@@ -8,7 +8,7 @@ export const getOrderData = async (filePath) => {
   let finalData = [];
   let data = await fs.promises.readFile(filePath);
   await workbook.xlsx.load(data.buffer);
-  const worksheet = workbook.getWorksheet(1);
+  const worksheet = workbook.getWorksheet("ban_hang");
   worksheet.eachRow((row, rowNumber) => {
     let rowData = row.values;
     rowData[0] = rowNumber;
@@ -22,7 +22,7 @@ export const getImportData = async (filePath) => {
   let finalData = [];
   let data = await fs.promises.readFile(filePath);
   await workbook.xlsx.load(data.buffer);
-  const worksheet = workbook.getWorksheet(2);
+  const worksheet = workbook.getWorksheet("nhap_hang");
   worksheet.eachRow((row, rowNumber) => {
     let rowData = row.values;
     rowData[0] = rowNumber;
@@ -36,13 +36,17 @@ export const getProductData = async (filePath) => {
   let finalData = [];
   let data = await fs.promises.readFile(filePath);
   await workbook.xlsx.load(data.buffer);
-  const worksheet = workbook.getWorksheet(3);
+  const worksheet = workbook.getWorksheet("san_pham");
   worksheet.eachRow((row, rowNumber) => {
     let rowData = row.values;
     rowData[0] = rowNumber;
     finalData.push(rowData);
   });
   return finalData;
+};
+
+const getMonthFromFileName = (filePath) => {
+  return filePath.split("").reverse().slice(5, 7).reverse().join("");
 };
 
 export const saveOrderData = async (excelFilePath, orderData) => {
@@ -53,13 +57,19 @@ export const saveOrderData = async (excelFilePath, orderData) => {
     await workbook.xlsx.load(data.buffer);
 
     //Get and update OrderSheet
-    const worksheet1 = workbook.getWorksheet(1);
-    worksheet1.addRow(Object.values(orderData));
+    const worksheetBanHang = workbook.getWorksheet("ban_hang");
+    if (!(getMonthFromFileName(excelFilePath) === moment().format("MM"))) {
+      workbook.removeWorksheet(worksheetBanHang.id);
+      const newWorksheetBanHang = workbook.addWorksheet("ban_hang");
+      newWorksheetBanHang.addRow(Object.values(orderData));
+    } else {
+      worksheetBanHang.addRow(Object.values(orderData));
+    }
 
     //Get and update ProductSheet
-    const worksheet3 = workbook.getWorksheet(3);
+    const worksheetSanPham = workbook.getWorksheet("san_pham");
     let productRow;
-    worksheet3.eachRow((row, rowNumber) => {
+    worksheetSanPham.eachRow((row, rowNumber) => {
       let productId = row.values[1];
       if (productId === orderData.id) {
         let rowData = row.values;
@@ -70,7 +80,7 @@ export const saveOrderData = async (excelFilePath, orderData) => {
     });
     let productRowNum = productRow[0];
     productRow.shift();
-    worksheet3.spliceRows(productRowNum, 1, productRow);
+    worksheetSanPham.spliceRows(productRowNum, 1, productRow);
 
     //Save to ExcelFile
     const buffer = await workbook.xlsx.writeBuffer();
@@ -96,24 +106,30 @@ export const saveImportData = async (excelFilePath, importData) => {
     await workbook.xlsx.load(data.buffer);
 
     //Get and update ImportSheet
-    const worksheet2 = workbook.getWorksheet(2);
-    worksheet2.addRow(Object.values(importData));
+    const worksheetNhapHang = workbook.getWorksheet("nhap_hang");
+    if (!(getMonthFromFileName(excelFilePath) === moment().format("MM"))) {
+      workbook.removeWorksheet(worksheetNhapHang.id);
+      const newWorksheetNhapHang = workbook.addWorksheet("nhap_hang");
+      newWorksheetNhapHang.addRow(Object.values(importData));
+    } else {
+      worksheetNhapHang.addRow(Object.values(importData));
+    }
 
     //Get and update ProductSheet
-    const worksheet3 = workbook.getWorksheet(3);
+    const worksheetSanPham = workbook.getWorksheet("san_pham");
     let productRow;
-    worksheet3.eachRow((row, rowNumber) => {
+    worksheetSanPham.eachRow((row, rowNumber) => {
       let productId = row.values[1];
       if (productId === importData.id) {
         let rowData = row.values;
         rowData[0] = rowNumber;
-        rowData[3] = +rowData[3] + +importData?.quantity;
+        rowData[3] = +rowData[3] - +importData?.quantity;
         productRow = rowData;
       }
     });
     let productRowNum = productRow[0];
     productRow.shift();
-    worksheet3.spliceRows(productRowNum, 1, productRow);
+    worksheetSanPham.spliceRows(productRowNum, 1, productRow);
 
     //Save to ExcelFile
     const buffer = await workbook.xlsx.writeBuffer();
@@ -139,8 +155,8 @@ export const saveProductData = async (excelFilePath, productData) => {
     await workbook.xlsx.load(data.buffer);
 
     //Get and update ProductSheet
-    const worksheet3 = workbook.getWorksheet(3);
-    worksheet3.addRow(Object.values(productData));
+    const worksheetSanPham = workbook.getWorksheet("san_pham");
+    worksheetSanPham.addRow(Object.values(productData));
 
     //Save to ExcelFile
     const buffer = await workbook.xlsx.writeBuffer();
